@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{margin: 0;padding: 0;}
+			html,body{height: 100%;overflow: hidden;}
+		</style>
+	</head>
+	<body>
+		<canvas id="cvs"></canvas>
+		<script type="text/javascript">
+			var cvs = document.getElementById('cvs');
+			cvs.width = window.innerWidth;
+			cvs.height = window.innerHeight;
+			var ctx = cvs.getContext('2d');
+			drawHeart(wordsPlay);
+			function drawHeart(callback){
+				ctx.fillStyle = 'rgba(255,255,255,0)';
+				ctx.fillRect(0,0,cvs.width,cvs.height);
+				var flowerHeart = {
+					heart:{
+						r:50,//半径
+						radian:Math.PI,//弧度
+						i:0,//动画记次
+						radianDecrement:Math.PI / 200 * 2,//心形线上的点的距离
+						time:20,//每个点之间的时间间隔
+						timmer:null,//定时器名称,
+						num:200,//分割为200个点
+						startRadian:Math.PI
+					},
+					flowerGarden:function(x,y,r){
+						var radians = (Math.PI / 180) * Math.round(360 / 5);
+						for(var j=0;j<5;j++){
+							var _x = x + r * Math.sin(radians * j),
+								_y = y + r * Math.cos(radians * j);
+							ctx.shadowColor = '#DC143C';
+							ctx.shadowBlur = 8;
+							ctx.lineCap = 'round';
+							ctx.fillStyle = 'rgb('+parseInt(Math.random()*155+100)+','+parseInt(Math.random()*255)+','+parseInt(Math.random()*155+100)+')';
+							ctx.strokeStyle = 'transparent';
+							ctx.beginPath();
+							ctx.moveTo(x,y);
+							ctx.bezierCurveTo(_x-Math.random()*r,_y,_x + Math.random()*r,_y,x,y);
+							ctx.stroke();
+							ctx.fill();
+							ctx.closePath();
+						}
+					},
+					getX:function(t,r){
+						return cvs.width * 7 / 10  + r / 2 * (16 * Math.pow(Math.sin(t), 3));  
+					},
+					getY:function(t,r){
+						return cvs.height / 2- 50 - r / 2 * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));  
+					}
+				};
+		        flowerHeart.heart.timmer = setInterval(function(){
+		        	flowerHeart.flowerGarden(flowerHeart.getX(flowerHeart.heart.radian,flowerHeart.heart.r),flowerHeart.getY(flowerHeart.heart.radian,flowerHeart.heart.r),20);
+		        	flowerHeart.heart.radian += flowerHeart.heart.radianDecrement;
+		        	flowerHeart.heart.i++;
+		        	if(flowerHeart.heart.i >= flowerHeart.heart.num){
+		        		clearInterval(flowerHeart.heart.timmer);
+		        		callback(drawBiaoda);
+		        	}
+		        },flowerHeart.heart.time);
+		    };
+		    
+		    function wordsPlay(callback){
+		    	var str = 'The furthest distance in the world.Is not between life and death.But when i stand in front of you.Yet you do not know that.I love you.The furthest distance in the world.Is not when i stand in front of you.Yet you can not see my love.But when undoubtedly knowing the love from both.Yet cannot be togehter.';
+		    	var cursorOpacity = 1 , start = 0 , index = 1 , count = 0 , wordsArr = [];
+		    	var wordsTimer = setInterval(function(){
+		    		ctx.clearRect(200,200,600,600);
+		    		var length = 0;
+		    		ctx.shadowBlur = 0;
+		    		ctx.fillStyle = 'rgba(0,0,0,0)';
+		    		ctx.fillRect(200,200,600,600);
+		    		ctx.fill();
+		    		if(cursorOpacity == 1){
+		    			cursorOpacity = 0;
+		    		}else{
+		    			cursorOpacity = 1;
+		    		}
+		    		ctx.font="20px microsoft yahei";
+		    		var gradient=ctx.createLinearGradient(0,0,cvs.width,cvs.height);
+					gradient.addColorStop("0","#1E90FF");
+					//gradient.addColorStop("0.5","black");
+					//gradient.addColorStop("1.0","#C71585");
+					// 用渐变填色
+					ctx.fillStyle=gradient;
+					ctx.strokeStyle = gradient;
+		    		//ctx.fillStyle = 'black';
+		    		for(var i=0;i<wordsArr.length;i++){
+		    			ctx.strokeText(wordsArr[i],250,230 + i * 40);
+		    			length += wordsArr[i].length;
+		    		}
+		    		var print = str.substr(start,index);
+		    		ctx.strokeText(print,250,230 + wordsArr.length * 40);
+		    		if(print.indexOf('.') > 0){
+		    			wordsArr.push(print);
+		    			start += index;
+		    			index = 1;
+		    		}
+		    		count++;
+		    		if(count % 2 == 0){
+		    			index++;
+		    		}
+		    		if(length == str.length){
+		    			cursorOpacity = 0;
+		    			clearInterval(wordsTimer);
+		    			callback();
+		    		}
+		    		ctx.fillStyle = 'rgba(0,0,0,'+cursorOpacity+')';
+		    		ctx.fillText('|',ctx.measureText(print).width + 256,230 + wordsArr.length * 40);
+		    	},10);
+		    };
+		    function drawBiaoda(){
+		    	var opacity = 0;
+		    	var timer = setInterval(function(){
+		    		ctx.shadowBlur = 0;
+		    		ctx.fillStyle = 'white';
+		    		ctx.fillRect(cvs.width * 7 / 10 - 200,cvs.height / 2 - 140,400,250);
+		    		ctx.font="16px microsoft yahei";
+		    		ctx.strokeStyle = 'rgba(220,20,60,'+opacity+')';
+		    		ctx.strokeText('亲爱的光伟老婆 ',cvs.width * 7 / 10 - 200 + 20,cvs.height / 2 - 140+20);
+		    		ctx.strokeText('圣诞节快乐！',cvs.width * 7 / 10 - 200 + 20,cvs.height / 2 - 140+50);
+		    		ctx.strokeText('每天和你在一起的时间就是我一天最开心的时候',cvs.width * 7 / 10 - 200 + 20,cvs.height / 2 - 140+80);
+		    		ctx.strokeText('陪伴是最长情的告白.',cvs.width * 7 / 10 - 200 + 20,cvs.height / 2 - 140+110);
+		    		ctx.strokeText('老婆，我会永远陪你在身边，呵护你，心疼你.',cvs.width * 7 / 10 - 200 + 20,cvs.height / 2 - 140+140);
+		    		ctx.strokeText('-爱你的赤赤',cvs.width * 7 / 10 - 200 + 300,cvs.height / 2 - 140+170);
+		    		ctx.strokeText('2016/12/23',cvs.width * 7 / 10 - 200 + 280,cvs.height / 2 - 140+200);
+		    		opacity+=0.01;
+		    		if(opacity >= 1){clearInterval(timer);}
+		    	},20);
+		    };
+		</script>
+	</body>
+</html>
